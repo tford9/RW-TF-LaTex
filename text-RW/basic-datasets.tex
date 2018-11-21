@@ -1,0 +1,26 @@
+\section{Some Realistic Data Sets}\label{sec:basic-datasets-\myInitials}
+
+% Discuss here what some data sets that represent instances of the problem might look like and/or are available. What are the number of vertexes or edges for real problems, where are there repositories for such data sets, are there any vertex or edge properties, is there any available graph generators that might be adopted to generating synthetic data sets, and how might such data sets for real applications grow in the future. How does it make sense in your implementation studies to vary the characteristics of test data sets to reflect how real-world data might want to vary?
+\subsection{Example Data Sets}
+
+\begin{table}
+    \centering
+    \begin{tabular}{lll}
+        \multicolumn{3}{c}{{\color[HTML]{343434} \textbf{Potential Datasets}}}                                               \\ \hline
+        \multicolumn{1}{|l|}{\textbf{Dataset}}  & \multicolumn{1}{l|}{\textbf{Approximate Order}} & \multicolumn{1}{l|}{\textbf{Approximate Size}}   \\ \hline
+        \multicolumn{1}{|l|}{DOT Railway Data}  & \multicolumn{1}{r|}{196K}           & \multicolumn{1}{r|}{250K} \\ \hline
+        \multicolumn{1}{|l|}{SNAP Airport Data} & \multicolumn{1}{r|}{456}            & \multicolumn{1}{r|}{71K}       \\ \hline
+        \multicolumn{1}{|l|}{KNB Shipping Data} & \multicolumn{1}{r|}{3700}     & \multicolumn{1}{r|}{15K}       \\ \hline
+    \end{tabular}
+    \label{table:potential_datasets}
+\end{table}
+
+Transportation networks, in general, are pretty ubiquitous. The SNAP Labs\footnote{\cite{snapnets}https://snap.stanford.edu/data/reachability.html} are usually maintain stable data repositories for network data, and here is no exception. The \textbf{Airline Travel Reachability Network} contains both US and Canadian airport travel nodes and edges, including plenty of metadata such as travel time, geodata, and other potentially useful things. 
+
+Maritime data is more difficult to find, but there are multiple years worth of shipping data maintained by The Knowledge Network for Biocomplexity (KNB)\cite{knb_data}, and increasing amounts of data in this space is becoming open access. Railway datasets are less convenient as the datasets are generally maintained by the respective governments for which the railway belongs. For instance, US railway data can be found at either Data.gov, or the Department Of Transportation data page\footnote{osav-usdot.opendata.arcgis.com/}.The size and order of these datasets can be found in table \ref{table:potential_datasets}.
+
+\subsection{Constructing A Complex Network}
+
+If we were to construct a complex network from the above transportation network datasets, we would find that the size and order of the network would increase greatly. For instance, if an airport terminal also contains a train terminal (not irregular) then the airport and train station nodes must either merge, or copy the inbound and outbound edges of their counterpart. This sort of node merging or edge duplication activity results in quite irregular networks. This irregularity, coupled with the network's heterogeneity, makes it difficult to build network generators that sufficiently capture the depth of interactions and metadata represented in real-world data.
+
+Moreover, as stated above, many of the datasets are maintained by separate entities and represent transportation networks that serve different goals. For instance, the difference between passenger trains and freight trains means a great deal when attempting to capture human vectored disease transmission. For these reasons, interested parties such as the World Health Organization (WHO) and the CDC are working with countries all over the world to increase the accuracy of and access to this data.

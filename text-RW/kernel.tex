@@ -1,0 +1,16 @@
+\section{\kernelName -A Key Graph Kernel}\label{sec:problem-\myInitials}
+
+% Discuss here what a graph kernel that can help solve such problems might be. Pseudo code is fine, but in enough detail that you can project time and space complexity. Discuss also what sort of performance metric makes sense.
+
+In the disease transmission scenario described above often to build these transmission models, probabilistic random walks are used to represent individuals (infected or otherwise) moving through the travel networks. Over time these random walks help tell the story of the ports that these individuals pass through and in doing so, give clues to health authorities on which ports to close or monitor more closely\cite{eb_trans1}.
+
+When considering all major travel networks in the world, the size of the networks can become time prohibitive. In the normal case of random walks this can be overcome with an ``embarrassingly parallel" variant of random walks effectively copies the network and runs separate walks on many different machines at once. The results of the separate random walks are then merged into a usable solution. Unfortunately, an active transmission scenario presents a dilemma for distributing the random walks; edits the underlying graph(port transmission potential), or the walker itself carries some accrued information(transmission potential) means that node and edge state is no longer guaranteed to be consistent across distributed random walkers.
+\subsection{Proposed Solution}
+This research proposes to extend the random walk kernel using a network specific distribution scheme that considers the interconnectedness of the network to determine how to distribute the network to random walkers, and suggests an optimizing function to shift or duplicate nodes based on the minimization of communication.
+
+\subsubsection{Network Partitioning}
+Unlike the embarrassingly parallel version of a random walk, to reduce memory usage and minimize the updating required to keep all network stores consistent our algorithm partitions the network into distinct subgraphs and distributes those subgraphs to each separate random walker. Optimally done, this partitioning would minimize the number of messages passed between distributed random walkers. To approximate this optimal partition, metrics such as min-cut and spectral clustering will be tested in small networks against a baseline of randomly distributed nodes.
+\subsubsection{Communication}
+\textbf{This is incredibly tentative!}
+When a random walker $r_1$ on a single partition $p_1$ attempts to traverse an edge that leads to another partition, say $p_2$, $r_1$ must communicate this intent to $r_2$ and $r_2$ determines how to handle the intent and respond to $r_1$. During this time, $r_1$ busy waits for a response from $r_2$. To avoid deadlock, if $r_2$ receives a new message while handling the current message, it will \textit{Do Something Surely.}
+

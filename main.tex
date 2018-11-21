@@ -1,0 +1,93 @@
+\documentclass[oneside,11pt]{book}
+
+
+\textwidth=6.5in \textheight=9.0in \oddsidemargin=0in \evensidemargin=0in
+\topmargin=-.5in \headheight=0.3in \headsep=0.2in \footskip=0.2in
+%%\topmargin=0in \headheight=0.5in \headsep=0.2in \footskip=0.2in
+\usepackage {amssymb}
+\usepackage [fleqn]{amsmath}
+\usepackage {graphicx}
+\usepackage {verbatim}
+\usepackage {longtable}
+\usepackage {listings}
+\usepackage{enumitem}
+
+\usepackage[table,xcdraw]{xcolor}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{ragged2e}
+\usepackage{algorithm}
+
+\usepackage[noend]{algpseudocode}
+
+\input{redirects.tex}
+
+\lstset{
+    basicstyle=\small\ttfamily,
+    escapechar = \@,
+    frame=none,
+    %language=matlab,
+    showstringspaces=false,
+    %framexleftmargin=0.25in,
+    xleftmargin=0.25in,
+    columns=flexible}
+
+\usepackage{makeidx}
+\makeindex
+
+\usepackage{fancyhdr}
+\pagestyle{fancy} \fancyhead{}
+
+%\chead {\doctypeshort:\doctitleshort}
+\chead {\doctitleshort}
+%\rhead{Version \docversion}
+\lfoot{Version \docversion}
+\cfoot{}
+\rfoot{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+
+%added to increase depth of TOC
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+
+
+\bibliographystyle{plain}
+
+\begin{document}
+\setcounter{page}{1}
+\pagenumbering{roman}
+
+\begin{comment}
+% Following is commented out
+\begin{titlepage}
+\begin{center}
+{ \LARGE \bf \noindent \doctype}
+
+\par { \LARGE \bf \noindent \doctitlelong}
+\vskip 0.5in
+{\LARGE \bf \noindent \chapterAuthor}
+\vskip 0.5in
+{\large \bf \noindent Version \docversion}
+\vskip 0.5in
+{\large \bf \noindent \modifieddate}
+\end{center}
+
+\end{titlepage}
+
+\end{comment}
+
+%\tableofcontents
+
+%\listoffigures
+
+%\listoftables
+
+\newpage
+\setcounter{page}{1} \pagenumbering{arabic} \rfoot{Page \thepage}
+
+\input{chapterHeader.tex}
+
+\bibliography{refs-RW}
+
+\printindex
+
+\end{document}

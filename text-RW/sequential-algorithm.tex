@@ -1,0 +1,33 @@
+\section{A Sequential Algorithm}\label{sec:sequential-algorithm-\myInitials}
+
+\justifying{
+
+One of the major advantages of the random walk process is that it is easy to understand in the uniformly weighted, non dynamic case. The algorithm is relatively simple. The input is a graph $G(V,E)$ where the edges $e \in E$ have associated weights, or transition probabilities $w_i$. If we consider a simple case where we select one starting vertex say $u$, and wish to perform a random step we would consider all adjacent vertices, say $x_1 \ldots x_k$, connected to $u$ over edges $e_1 \ldots e_k$, with associated weights $w_1 \ldots x_k$. Before taking a step, the weights of the adjacent vertices must be normalized as follows: 
+
+\begin{center}
+    $$p_i = \frac{w_i}{\sum_1^k{w_i}}$$
+\end{center}
+
+
+Where each of the $p_i$ will represent the probability of traversing across a given edge $e_i$. Given the normalization process, we are guaranteed that the probability of all adjacent edges will sum to 1, so we can use a standard uniform random number generator to sample from the edges. At that point we may successfully take a step. We can take as many of these steps as are available, and upon completion we are returned a vector containing the path of the random walk, starting with vertex $u$.
+\par
+\begin{algorithm}[H]
+\SetAlgoLined
+\KwData{Graph $G(V,E)$}
+\KwResult{Path Of Random Walk}
+ Select A Start Node $u$ Randomly\;
+ Initialize path vector P.append($u$)\;
+ \While{True}{
+    edges=$u$.adjacent\;
+  \eIf{edges.length $>$ 0}{
+   edges.prob = normalize(edges.weights)\;
+   $u$ = uniformSelect(edges.prob)\;
+   P.append($u$)\;
+   }{
+   \textbf{return} P\;
+  }
+ }
+ \caption{Simple Random Walk}
+ \label{alg:simple_rw}
+\end{algorithm}
+}
