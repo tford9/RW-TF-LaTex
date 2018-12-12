@@ -2,15 +2,63 @@
 
 % Discuss here what a graph kernel that can help solve such problems might be. Pseudo code is fine, but in enough detail that you can project time and space complexity. Discuss also what sort of performance metric makes sense.
 
-In the disease transmission scenario described above often to build these transmission models, probabilistic random walks are used to represent individuals (infected or otherwise) moving through the travel networks. Over time these random walks help tell the story of the ports that these individuals pass through and in doing so, give clues to health authorities on which ports to close or monitor more closely\cite{eb_trans1}.
+When a problem can be represented as a graph, a simple random walk on that graph represents unbiased movement through the graph where only structure is considered. For this reason, random walks are often used to determine if real observed traversal through a network is being influenced by non-structural factors. In this way, random walks serve as a traversal baseline given no prior knowledge of the graph. 
 
-When considering all major travel networks in the world, the size of the networks can become time prohibitive. In the normal case of random walks this can be overcome with an ``embarrassingly parallel" variant of random walks effectively copies the network and runs separate walks on many different machines at once. The results of the separate random walks are then merged into a usable solution. Unfortunately, an active transmission scenario presents a dilemma for distributing the random walks; edits the underlying graph(port transmission potential), or the walker itself carries some accrued information(transmission potential) means that node and edge state is no longer guaranteed to be consistent across distributed random walkers.
+Given a graph $G(V,E)$ where $V$ is a set of vertices and $E$ is a set of edges for which an edge $(u,v) \in E \iff u, v \in V$ if edge $(u,v)\inE$ then vertices $u$ and $v$ are said to be adjacent. A random walk on a graph $G$ is a sequence $S$ of adjacent vertices, where for any vertex in the sequence $s_i$, vertex $s_{i+1}$ is chosen at by some heuristic, normally uniform random selection, from vertices adjacent to $s_i$. 
+
+Using the above described random walk as a baseline, we can tailor a random walk to model our problem by specifying the heuristics our walk will use to select an adjacent vertex to traverse. To test whether our heuristic appropriately models our specific application, we can attempt to replicate a previously observed real-world occurrence of our application. The closer we are able to get the model to approximate real-world observations the better. We can iteratively modify the model heuristics to better fit observations using several methods (gradient descent, grid search, etc.). Using this simple process a random walk model can be built to fit our application. Once a good model is trained the goal would be to use the model to make predictions about unobserved occurrences. In our specific application we would want to use the model to make predictions about epidemic transmission for future disease outbreaks. In the disease transmission scenario described above, probabilistic random walks are used to represent individuals (infective or susceptible) moving through travel networks.
+
+Unfortunately, in the real world infective individuals don't just traverse through a network. As infective individuals move through a network there are contagion characteristics to consider. Disease specific factors that a high-fidelity model would need to consider are:
+\begin{center}
+    \title{Disease specific model factors}
+    \parbox[t]{2.4in}{
+        \raggedright%
+        \begin{itemize}[topsep=0pt,itemsep=-2pt,leftmargin=13pt]
+            \item Carrier Proportion
+            \item Incubation time
+            \item Infective Duration
+        \end{itemize}
+    }%
+    \parbox[t]{2.4in}{
+        \raggedright%
+        \begin{itemize}[topsep=0pt,itemsep=-2pt,leftmargin=13pt]
+            \item Infectivity
+            \item Transmissibility 
+            \item Mobility Index
+        \end{itemize}
+    }
+\end{center}
+
+% \begin{itemize}
+%     \title{Disease specific model factors}
+%     \item Carrier Proportion
+%     \item Incubation time
+%     \item Infective Duration
+%     \item Infectivity
+%     \item Transmissibility 
+%     \item Mobility Index
+% \end{itemize}
+
+Many of these factors require their own statistical models for best approximations. For our sequential and enhanced implementation we will keep our model model as simple as reasonable to test benchmark our solutions as comparably as possible. More clearly stated, the statistical support that would enable consideration of these disease specific factors are computationally expensive and rely heavily on pseudo-random sampling. Not only would this type of sampling increase the computation time of our implementations, but it would introduce a great deal of uncertainty into our results. The factors this implementation will consider are discussed in Section \ref{sec:sequential-algorithm-\myInitials}.
+
+\subsection{Computational Bottleneck}
+
+Consider the given application. If one wanted use a random walk based algorithm to model epidemic transmission within a real-world travel network then none of the individual data sets referenced above would be sufficient. People use many modes of transportation, and often mix modes during travel. Merge any two travel networks together and it quickly becomes apparent that the number of vertices may be linear, but the number of edges and the overall complexity of the resulting network increases exponentially.
+One of the most powerful motivations for using random walk based algorithms is their speed, but the network sizes and complexity means that a random walk sequence may need tens of billions of steps model a scenario, and that process is repeated until goodness of fit is reached. Refining a model on a network of this scale is time prohibitive.
+
+In the general case of random walks the computation time can be reduced using an ``embarrassingly parallel" variant of the algorithm that runs separate walks on different copies of the same graph using many different compute nodes simultaneously. When the individual compute nodes reach a stopping point their results are gathered and merged into a final product. Unfortunately in the epidemic transmission specific random walk an embarrassingly parallel implementation does not exist. Because our random walker carriers information that could change the underlying network, means that the graph is not guaranteed to be consistent across the individual compute nodes.
+
+Considering these facts the obvious option is to do away with different compute nodes operating on copies of the graph, and have them work on the same copy simultaneously. This method introduces the problems of compute node memory consistency and coherence. Fortunately, there is another strategy. 
+
 \subsection{Proposed Solution}
-This research proposes to extend the random walk kernel using a network specific distribution scheme that considers the interconnectedness of the network to determine how to distribute the network to random walkers, and suggests an optimizing function to shift or duplicate nodes based on the minimization of communication.
+
+This research proposes to parallelize a random walk based epidemic transmission model across many compute nodes by partitioning the original network and distributing said partitions to the memory associated with individual compute nodes. Each compute node will be responsible for operations relating to the vertices within the partition of the graph allocated to it, and the outgoing edges associated with those vertices. This method still introduces the need for compute nodes to communicate when . Parallel Boost Graph Library extend the random walk kernel using a network specific distribution scheme that considers the interconnectedness of the network to determine how to distribute the network to compute nodes maintaining their own random walkers, and suggests an optimizing function to shift or duplicate nodes based on the minimization of communication.
 
 \subsubsection{Network Partitioning}
-Unlike the embarrassingly parallel version of a random walk, to reduce memory usage and minimize the updating required to keep all network stores consistent our algorithm partitions the network into distinct subgraphs and distributes those subgraphs to each separate random walker. Optimally done, this partitioning would minimize the number of messages passed between distributed random walkers. To approximate this optimal partition, metrics such as min-cut and spectral clustering will be tested in small networks against a baseline of randomly distributed nodes.
+
+Unlike the standard parallel random walk algorithm, we cannot arbitrarily partition our graph and distribute the partitions to distinct compute nodes and merge their individual results. The dynamism of the disease transmission random walk algorithm requires that changes to the underlying network such as edge and vertex properties are expected. Moreover, the compute nodes themselves can change the underlying graph attributes. Optimally done, this partitioning would minimize the number of messages passed between distributed random walkers. To approximate this optimal partition, metrics such as min-cut and spectral clustering will be tested in small networks against a baseline of randomly distributed nodes.
+
 \subsubsection{Communication}
-\textbf{This is incredibly tentative!}
-When a random walker $r_1$ on a single partition $p_1$ attempts to traverse an edge that leads to another partition, say $p_2$, $r_1$ must communicate this intent to $r_2$ and $r_2$ determines how to handle the intent and respond to $r_1$. During this time, $r_1$ busy waits for a response from $r_2$. To avoid deadlock, if $r_2$ receives a new message while handling the current message, it will \textit{Do Something Surely.}
+
+Communication will be handled by the Parallel Boost Graph Library's process group. I'll expand upon this in the next revision. 
 

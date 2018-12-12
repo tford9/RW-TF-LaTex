@@ -2,7 +2,7 @@
 
 % Discuss here how instances of that problem can be expressed as a graph.
 
-We can formalize the above problem as a complex, heterogeneous network. With the following structure:
+We can formalize the above problem as a complex, heterogeneous network with the following structure:
 
 \begin{center}
     \parbox[t]{2.4in}{
@@ -26,13 +26,15 @@ We can formalize the above problem as a complex, heterogeneous network. With the
     }
 \end{center}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=1.0\textwidth]{figures-RW/usairport_base.png}
-    \caption{US Domestic Airport Network\cite{stanford_dhs}}
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.7\textwidth]{figures-RW/usairport_base.png}
+    \caption{ \centering
+        The US Domestic Flight Network\cite{stanford_dhs} - Shows the US subset of the SNAP US and Canada Airport data set\cite{snapnets} in Table \ref{table:potential_datasets}. Nodes are airports, edges are the connections between them. Edge are colored relative to the frequency of travel between incident airports.
+    }
     \label{fig:us_domestic}
 \end{figure}
 
 \newpage
-Figure \ref{fig:us_domestic} shows a network containing only nodes of type \textit{airport}, with edges weighted and colored by the frequency of travel between two airports.
+
 

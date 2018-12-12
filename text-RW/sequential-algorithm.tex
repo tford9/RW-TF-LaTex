@@ -8,26 +8,110 @@ One of the major advantages of the random walk process is that it is easy to und
     $$p_i = \frac{w_i}{\sum_1^k{w_i}}$$
 \end{center}
 
-
 Where each of the $p_i$ will represent the probability of traversing across a given edge $e_i$. Given the normalization process, we are guaranteed that the probability of all adjacent edges will sum to 1, so we can use a standard uniform random number generator to sample from the edges. At that point we may successfully take a step. We can take as many of these steps as are available, and upon completion we are returned a vector containing the path of the random walk, starting with vertex $u$.
 \par
-\begin{algorithm}[H]
-\SetAlgoLined
-\KwData{Graph $G(V,E)$}
-\KwResult{Path Of Random Walk}
- Select A Start Node $u$ Randomly\;
- Initialize path vector P.append($u$)\;
- \While{True}{
-    edges=$u$.adjacent\;
-  \eIf{edges.length $>$ 0}{
-   edges.prob = normalize(edges.weights)\;
-   $u$ = uniformSelect(edges.prob)\;
-   P.append($u$)\;
-   }{
-   \textbf{return} P\;
-  }
- }
- \caption{Simple Random Walk}
- \label{alg:simple_rw}
+% \begin{algorithm}[H]
+% \SetAlgoLined
+% \KwData{Graph $G(V,E)$}
+% \KwResult{Boolean Infective State}
+% v0 = random(vertex, G); \\
+% Let $p, \lambda, \mu$ be $RV$ \\
+% $\forall v \in V$ let $loc[v] = (init\_pop,init\_ipop,init\_spop)$:\\
+% $\forall v \in V$ let $floc[v] = (0,0,0)$:\\
+% \begin{algorithmic}
+% \While{Heterogenous}
+    
+%     \State \EndWhile
+% \end{algorithmic}
+%  \caption{Simple Random Walk}
+%  \label{alg:simple_rw}
+% \end{algorithm}
+
+
+\begin{algorithm}[H] 
+\caption{Random Walk With A Purpose}
+\label{alg:loop}
+\begin{algorithmic}[1]
+\Require{Graph $G(V,E)$} 
+\Ensure{Boolean Infective State}
+\Statex{Let $p, \lambda, \mu$ be $RVs$}
+
+\State{v0 = random(vertex, G);}
+\State{$\forall v \in V$ let $loc[v] = (init\_pop,init\_ipop,init\_spop)$:}
+\State{$\forall v \in V$ let $floc[v] = (0,0,0)$:}
+\While{(True)}
+    \For{$v \in V$}                    
+        \State {\texttt{infect(loc[v]);}}
+        \State {\texttt{recover(floc[v]);}}
+        \State {\texttt{move(floc[v]);}}
+    \EndFor
+    \For{$v \in V$}                    
+        \State{\texttt{update(loc[v]+=floc[v])}} \Comment{If no update for any v, break;}
+    \EndFor
+\EndWhile
+\State{\texttt{total\_pop = sum(loc[:](0))}}
+\If{\texttt{(sum(loc[:](1)) == total\_pop)}}
+    \State \Return{True}    
+\EndIf
+\State{\Return{False}}
+\end{algorithmic}
 \end{algorithm}
+
+To tailor this algorithm to the requirements of the disease transmission model we introduce variables mirroring those used in Kelker's seminal work\cite{Kelker1973} published in 1973 that used a simple grid model and a minimal set of transition parameters to model the spread of measles and ferret distemperment. Put simply, the model used a 2x2 grid of vertices within which 4 infective individuals were located at time zero. At each successive time step each individual has an equal opportunity of staying in place, or moving to one of the adjacent nodes. Let this probability be $\lambda$. If an individual moved to a vertex that contains uninfected, or susceptible individuals, there is a probability $p$ that each may become infected. The paper also introduced a variable $\mu$to represent the probability that at each time-step a person recovers, or changes from an infective state to a susceptible state.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+
+    \node[state,rectangle] (a) at (0,2) {$1$};
+    \node[state,rectangle] (b) at (0,0) {$2$};
+    \node[state,rectangle] (c) at (2,0) {$3$};
+    \node[state,rectangle] (d) at (2,2) {$4$};
+
+    \path[bidirected] (a) edge (b);
+    \path[bidirected] (a) edge (d);
+    \path[bidirected] (b) edge (c);
+    \path[bidirected] (c) edge (d);
+    % \path[bidirected] (p) edge (x);
+    % \path[bidirected] (k) edge (y);
+    % \path (k) edge (x);
+
+    % \node[draw=blue,dotted,fit=(x) (y), inner sep=0.2cm] (machine) {};
+    
+    
+\end{tikzpicture}   
+\caption{Kekler's 2x2 Grid Graph For Epidemic Simulation \cite{Kelker1973}}
+\end{figure}
+
+Within our sequential implementation we modify Kekler's algorithms such that the graph is no longer a 2x2 grid, but graphs generated from real-world data and graph generation models. We also improve accuracy by $\lambda,\,\mu,\,\text{and } p$ be sampled from distributions instead of being variables set based on expert opinion or solely on prior data.
+
+\subsection{Pseudocode}
+
+\begin{lstlisting}[language=C++, caption={Selecting a Vertex to be Infected}]
+// Define a grid_graph where the second dimension doesn't wrap
+boost::array<std::size_t, 2> lengths = { { DIMENSIONS, DIMENSIONS } };
+boost::array<bool, 2> wrapped = { { false, false } };
+GraphType graph(lengths, wrapped);
+
+// Get the index map of the grid graph
+typedef boost::property_map<GraphType, boost::vertex_index_t>::const_type indexMapType;
+indexMapType indexMap(get(boost::vertex_index, graph));
+
+// Create a float for every node in the graph
+boost::vector_property_map<VertexProperties , indexMapType> dataMap(num_vertices(graph), indexMap);
+
+// INIT VERTEXPROPERTIES
+for (uint i = 0; i < DIMENSIONS; ++i)
+	for (uint j = 0; j < DIMENSIONS; ++j)
+    	put(dataMap, Traits::vertex_descriptor {{i, j}}, VertexProperties{i,j,1});
+
+// SELECT INFECTED
+Vertex init_infected = random_vertex(graph, rng);
+auto init_infected_vp = get(dataMap, init_infected);
+init_infected_vp.set_current_values(1,1,0);
+put(dataMap, init_infected, init_infected_vp );
+\end{lstlisting}
+
+% For this flexibility we would like to introduce an iterative Bayesian statistical inference method
+
 }

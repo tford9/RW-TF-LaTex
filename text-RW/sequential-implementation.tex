@@ -1,3 +1,8 @@
 \section{A Reference Sequential Implementation}\label{sec:sequential-implementation-\myInitials}
 
-To compare most evenly with the parallel version of the code, the sequential implementation was written with the Boost Graph Library using no parallel options. The Parallel Boost Graph Library will be used for the parallel implementation of the code.
+The current sequential implementation generates grid networks due to their regular network structures as the order of the network increases. The aim of this grid based implementation is to regularize the scaling results and make easier the comparison between the sequential and the parallel implementations of the disease transmission model.
+
+% Get the correct citation for the paper
+For the sequential representation, our implementation will roughly copy that put forth by Kelker in 1973\cite{Kelker1973}. Modifications were to increase the accuracy of the model by allowing the three variables ($\lambda$, $\mu$, and $p$) to be samples from non-uniform distributions. We also allow graphs that are not grids. Kelker's simulation model was the groundwork for more recent epidemic transmission simulations, but the complexity that they add to the random walk process makes it difficult to do meaningful complexity analysis of the algorithms. 
+
+We also adopt Kelker's stopping criteria, in that we run the model until all of the individuals reach a homogeneous state. That is to say that either all people are infective, or all people are susceptible. Reasonable thresholds can be used instead of absolute convergence, but for the parameters that we set, absolute convergence should always be possible. 

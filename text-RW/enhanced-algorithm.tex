@@ -1,5 +1,23 @@
 \section{An Enhanced Algorithm}\label{sec:enhanced-algorithm-\myInitials}
 
-% Discuss here the outlines of an enhanced algorithm. This could be a parallel code, a code with some significant heuristics, or a code written in a non-traditional programming paradigm. Pseudocode is fine. Discuss what you think is the computational complexity.
+% Discuss here the outlines of an enhanced algorithm. This could be a parallel code, a code with some significant heuristics, or a code written in a non-traditional programming paradigm. Pseudo-code is fine. Discuss what you think is the computational complexity.
 
-Forthcoming.
+\begin{algorithm}[H]
+\SetAlgoLined
+\KwData{Graph $G(V,E)$}
+\KwResult{Path Of Random Walk}
+Select A Start Node $u$ Randomly\\
+Initialize path vector P.append($u$)\\
+ \While{True}{
+    edges=$u$.adjacent\\
+  \eIf{edges.length $>$ 0}{
+   edges.prob = normalize(edges.weights)\\
+   $u$ = uniformSelect(edges.prob)\\
+   P.append($u$)\;
+   }{
+   \textbf{return} P\;
+  }
+ }
+ \caption{Simple Random Walk}
+ \label{alg:simple_rw}
+\end{algorithm}

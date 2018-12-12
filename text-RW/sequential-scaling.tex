@@ -1,14 +1,13 @@
 \section{Sequential Scaling Results}\label{sec:sequential-scaling-\myInitials}
 
-% Discuss here results from your sequential implementation. Include software and hardware configuration, where the input graph data sets came from, and how input data set characteristics were varied. Did the performance as a function of size vary as you predicted?
+\subsection{Experimental Configuration}
+All scaling tests were performed on an Intel Core i5-4278U @ 2.60GHz with 3MB of cache, and 16GB of DDR3 RAM. The sequential version of the algorithm was implemented using The Boost Libraries version 1.68. The application was compiled using GCC version 8.1.
 
-For readability, these results have been broken into sections based on a given stopping criteria.
-
-\subsection{Stopping Criteria: BFS}
-\subsection{Stopping Criteria: DFS}
-\subsection{Stopping Criteria: Vertex Cover}
-\subsection{Stopping Criteria: Mixture}
-
+\subsection{Stopping Criteria: Disease Eradictaion, or Worst Case Epidemic Scenario}
 When discussing the scaling results of the sequential random walk implementation, what must first be imposed is a \textit{stopping criteria}. Without a stopping criteria a random walk has no definite end state. For the purposes of the results here, the algorithm will stop once all nodes have been visited at least once, also known as the \textit{node cover} stopping criteria. Even with this imposition, it has been shown that the speed of random walks changes with the structure of the network being traversed\cite{Virág99onthe}. This limits the inferences that can be gleamed from the results from different graphs in relation to each other, but during the parallel implementation results analysis we can compare the two algorithms directly over each of the networks.
 
-Results from the sequential implementation are forthcoming, dealing with some slippery errors during optimization.
+*Still working on plots*
+
+\subsection{Stopping Criteria: Homogeneous State}
+*Still working on plots*
+
